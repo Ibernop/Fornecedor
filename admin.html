@@ -51,6 +51,38 @@ input, select, textarea { padding: 10px 12px; border: 1px solid var(--border); b
 .entry-actions { margin-top: 12px; display: flex; gap: 8px; flex-wrap: wrap; }
 .itens-list { margin-top: 10px; font-size: 0.86rem; color: var(--gray); }
 .empty-state { text-align: center; color: var(--gray-light); padding: 50px 20px; }
+
+/* ---------- Lista de separação (modal + impressão) ---------- */
+#separacaoBackdrop { display: none; position: fixed; inset: 0; background: rgba(20,25,23,0.6); z-index: 90; }
+#separacaoModal { display: none; position: fixed; inset: 0; z-index: 91; overflow-y: auto; padding: 30px 16px; }
+#separacaoBackdrop.open, #separacaoModal.open { display: block; }
+#separacaoConteudo { max-width: 720px; margin: 0 auto; background: #fff; border-radius: var(--radius); padding: 36px 40px; }
+.separacao-header { display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; border-bottom: 3px solid var(--charcoal); padding-bottom: 18px; margin-bottom: 24px; }
+.separacao-titulo { font-size: 1.6rem; font-weight: 800; }
+.separacao-sub { font-size: 1.1rem; color: var(--gray); margin-top: 4px; }
+.separacao-header-actions { display: flex; gap: 8px; }
+.separacao-item {
+  display: flex; align-items: center; gap: 18px;
+  padding: 16px 4px; border-bottom: 1px solid var(--border);
+  font-size: 1.15rem;
+}
+.separacao-item input[type="checkbox"] { width: 26px; height: 26px; flex-shrink: 0; accent-color: var(--charcoal); }
+.separacao-item .separacao-qty {
+  background: var(--charcoal); color: #fff; font-weight: 800; font-size: 1.2rem;
+  min-width: 52px; text-align: center; padding: 6px 10px; border-radius: 8px; flex-shrink: 0;
+}
+.separacao-item .separacao-nome { font-weight: 700; }
+.separacao-item .separacao-tamanho { color: var(--gray); font-weight: 600; }
+.separacao-item.riscado { opacity: 0.4; text-decoration: line-through; }
+
+@media print {
+  body * { visibility: hidden; }
+  #separacaoModal, #separacaoModal * { visibility: visible; }
+  #separacaoModal { position: absolute; top: 0; left: 0; padding: 0; }
+  #separacaoConteudo { box-shadow: none; max-width: 100%; }
+  .separacao-header-actions { display: none; }
+  #separacaoBackdrop { display: none !important; }
+}
 </style>
 </head>
 <body>
@@ -73,13 +105,36 @@ input, select, textarea { padding: 10px 12px; border: 1px solid var(--border); b
     <div class="tabs">
       <button id="tabClientes" class="active" onclick="setTab('clientes')">Clientes</button>
       <button id="tabPedidos" onclick="setTab('pedidos')">Encomendas</button>
+      <button id="tabStock" onclick="setTab('stock')">Stock</button>
     </div>
 
     <div id="panelClientes"></div>
     <div id="panelPedidos" style="display:none;"></div>
+    <div id="panelStock" style="display:none;">
+      <input type="text" id="stockSearch" placeholder="Pesquisar produto..." oninput="renderStockList()" style="width:100%; margin-bottom:16px;">
+      <div id="stockList"></div>
+    </div>
   </div>
 </div>
 
+<div id="separacaoBackdrop" onclick="fecharListaSeparacao()"></div>
+<div id="separacaoModal">
+  <div id="separacaoConteudo">
+    <div class="separacao-header">
+      <div>
+        <div class="separacao-titulo">Lista de separação</div>
+        <div id="separacaoCliente" class="separacao-sub"></div>
+      </div>
+      <div class="separacao-header-actions">
+        <button class="btn" onclick="window.print()">🖨️ Imprimir</button>
+        <button class="btn" onclick="fecharListaSeparacao()">Fechar</button>
+      </div>
+    </div>
+    <div id="separacaoLista"></div>
+  </div>
+</div>
+
+<script src="produtos-data.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
@@ -128,10 +183,13 @@ auth.onAuthStateChanged(user => {
 function setTab(tab) {
   document.getElementById('tabClientes').classList.toggle('active', tab === 'clientes');
   document.getElementById('tabPedidos').classList.toggle('active', tab === 'pedidos');
+  document.getElementById('tabStock').classList.toggle('active', tab === 'stock');
   document.getElementById('panelClientes').style.display = tab === 'clientes' ? 'block' : 'none';
   document.getElementById('panelPedidos').style.display = tab === 'pedidos' ? 'block' : 'none';
+  document.getElementById('panelStock').style.display = tab === 'stock' ? 'block' : 'none';
   if (tab === 'clientes') loadClientes();
   if (tab === 'pedidos') loadPedidos();
+  if (tab === 'stock') loadStockAdmin();
 }
 
 // ---------- Clientes ----------
@@ -180,19 +238,21 @@ function setDesconto(uid) {
 }
 
 // ---------- Encomendas ----------
+let allPedidos = [];
+
 function loadPedidos() {
   const el = document.getElementById('panelPedidos');
   el.innerHTML = '<div class="empty-state">A carregar...</div>';
   db.collection('pedidos_b2b').orderBy('criadoEm', 'desc').get().then(snap => {
     if (snap.empty) { el.innerHTML = '<div class="empty-state">Ainda não há encomendas.</div>'; return; }
-    el.innerHTML = snap.docs.map(doc => {
-      const p = doc.data();
+    allPedidos = snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+    el.innerHTML = allPedidos.map(p => {
       const itensHtml = (p.itens || []).map(it => `${it.qty}x ${it.nome} (${it.tamanho}) — ${(it.preco * it.qty).toFixed(2)}€`).join('<br>');
       const metodoLabel = p.metodoPagamento === 'cheque30' ? 'Cheque a 30 dias' : 'Pronto pagamento';
       let actions = '';
-      if (p.estado === 'pendente') actions = `<button class="btn primary" onclick="setEstadoPedido('${doc.id}','separado')">Marcar como separado</button>`;
-      else if (p.estado === 'separado') actions = `<button class="btn primary" onclick="setEstadoPedido('${doc.id}','enviado')">Marcar como enviado</button> <button class="btn" onclick="setEstadoPedido('${doc.id}','pendente')">Voltar a pendente</button>`;
-      else actions = `<button class="btn" onclick="setEstadoPedido('${doc.id}','separado')">Reabrir</button>`;
+      if (p.estado === 'pendente') actions = `<button class="btn primary" onclick="setEstadoPedido('${p.id}','separado')">Marcar como separado</button>`;
+      else if (p.estado === 'separado') actions = `<button class="btn primary" onclick="setEstadoPedido('${p.id}','enviado')">Marcar como enviado</button> <button class="btn" onclick="setEstadoPedido('${p.id}','pendente')">Voltar a pendente</button>`;
+      else actions = `<button class="btn" onclick="setEstadoPedido('${p.id}','separado')">Reabrir</button>`;
       return `
         <div class="entry-card">
           <div class="entry-top">
@@ -204,7 +264,10 @@ function loadPedidos() {
             <span class="badge ${p.estado}">${p.estado}</span>
           </div>
           <div class="itens-list">${itensHtml}</div>
-          <div class="entry-actions">${actions}</div>
+          <div class="entry-actions">
+            <button class="btn" style="background:var(--charcoal); color:#fff; border-color:var(--charcoal);" onclick="abrirListaSeparacao('${p.id}')">📋 Lista de separação</button>
+            ${actions}
+          </div>
         </div>`;
     }).join('');
   });
@@ -212,6 +275,71 @@ function loadPedidos() {
 
 function setEstadoPedido(id, estado) {
   db.collection('pedidos_b2b').doc(id).update({ estado }).then(loadPedidos);
+}
+
+// ---------- Stock ----------
+let liveStockAdmin = {}; // vindo do Firestore
+
+function loadStockAdmin() {
+  document.getElementById('stockList').innerHTML = '<div class="empty-state">A carregar...</div>';
+  db.collection('estoque_b2b').get().then(snap => {
+    liveStockAdmin = {};
+    snap.forEach(doc => { liveStockAdmin[doc.id] = doc.data().qty; });
+    renderStockList();
+  }).catch(err => {
+    document.getElementById('stockList').innerHTML = '<div class="empty-state">Erro ao carregar stock.</div>';
+    console.error(err);
+  });
+}
+
+function renderStockList() {
+  const termo = (document.getElementById('stockSearch').value || '').toLowerCase();
+  const el = document.getElementById('stockList');
+  const linhas = [];
+  produtos.forEach(p => {
+    if (termo && !p.nome.toLowerCase().includes(termo)) return;
+    p.tamanhos.forEach(t => {
+      const key = `${p.id}_${t.label}`;
+      const qty = liveStockAdmin[key] !== undefined ? liveStockAdmin[key] : t.stock;
+      linhas.push({ key, nome: p.nome, tamanho: t.label, qty });
+    });
+  });
+  if (linhas.length === 0) { el.innerHTML = '<div class="empty-state">Sem resultados.</div>'; return; }
+  el.innerHTML = linhas.map(l => `
+    <div class="entry-card" style="display:flex; align-items:center; justify-content:space-between; gap:12px; padding:12px 18px;">
+      <div><strong>${l.nome}</strong> <span style="color:var(--gray);">— ${l.tamanho}</span></div>
+      <div style="display:flex; align-items:center; gap:8px;">
+        <input type="number" id="stock-${l.key}" value="${l.qty}" min="0" style="width:80px;">
+        <button class="btn primary" onclick="guardarStock('${l.key}')">Guardar</button>
+      </div>
+    </div>`).join('');
+}
+
+function guardarStock(key) {
+  const val = parseInt(document.getElementById(`stock-${key}`).value || '0', 10);
+  db.collection('estoque_b2b').doc(key).set({ qty: val }, { merge: true }).then(() => {
+    liveStockAdmin[key] = val;
+  });
+}
+
+// ---------- Lista de separação ----------
+function abrirListaSeparacao(id) {
+  const p = allPedidos.find(x => x.id === id);
+  if (!p) return;
+  document.getElementById('separacaoCliente').textContent = `${p.empresa} · Pedido ${id.slice(-6).toUpperCase()}`;
+  document.getElementById('separacaoLista').innerHTML = (p.itens || []).map((it, i) => `
+    <label class="separacao-item" id="sep-item-${i}">
+      <input type="checkbox" onchange="document.getElementById('sep-item-${i}').classList.toggle('riscado', this.checked)">
+      <span class="separacao-qty">${it.qty}x</span>
+      <span><span class="separacao-nome">${it.nome}</span> <span class="separacao-tamanho">— ${it.tamanho}</span></span>
+    </label>`).join('');
+  document.getElementById('separacaoBackdrop').classList.add('open');
+  document.getElementById('separacaoModal').classList.add('open');
+}
+
+function fecharListaSeparacao() {
+  document.getElementById('separacaoBackdrop').classList.remove('open');
+  document.getElementById('separacaoModal').classList.remove('open');
 }
 </script>
 </body>
