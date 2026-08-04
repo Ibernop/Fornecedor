@@ -1,88 +1,61 @@
 // ============================================================
 // Catálogo Ownat — Loja B2B Ibernop
-// ATENÇÃO: preços aqui são placeholders/exemplo, não são os preços
-// reais de distribuidor. Substituir assim que tiveres a lista da Ownat.
+// Produtos e fotos reais (as mesmas já usadas na loja do Centro
+// Veterinário Linda-a-Velha). ATENÇÃO: os PREÇOS continuam a ser
+// placeholders/exemplo — substituir assim que tiveres a lista real
+// de preços de distribuidor da Ownat.
 // ============================================================
 
 const produtos = [
-  // ---------- OWNAT PRIME (cão) ----------
-  { id: 1, especie: 'cao', gama: 'Prime', nome: 'Ownat Prime Adult Chicken & Turkey (Cão)', tamanhos: [
-    { label: '3kg', preco: 12.50, stock: 20 },
-    { label: '7.5kg', preco: 24.90, stock: 20 },
-    { label: '14kg', preco: 39.90, stock: 15 },
-  ]},
-  { id: 2, especie: 'cao', gama: 'Prime', nome: 'Ownat Prime Adult Lamb (Cão)', tamanhos: [
-    { label: '3kg', preco: 13.20, stock: 15 },
-    { label: '7.5kg', preco: 26.50, stock: 15 },
-    { label: '14kg', preco: 42.50, stock: 10 },
-  ]},
-  { id: 3, especie: 'cao', gama: 'Prime', nome: 'Ownat Prime Mini Adult (Cão)', tamanhos: [
-    { label: '3kg', preco: 13.90, stock: 15 },
-    { label: '7.5kg', preco: 27.90, stock: 15 },
-  ]},
-  { id: 4, especie: 'cao', gama: 'Prime', nome: 'Ownat Prime Puppy (Cão)', tamanhos: [
-    { label: '3kg', preco: 13.90, stock: 15 },
-    { label: '7.5kg', preco: 27.90, stock: 12 },
-  ]},
-
-  // ---------- OWNAT PRIME (gato) ----------
-  { id: 20, especie: 'gato', gama: 'Prime', nome: 'Ownat Prime Adult Chicken & Turkey (Gato)', tamanhos: [
-    { label: '1.5kg', preco: 9.90, stock: 20 },
-    { label: '3kg', preco: 17.90, stock: 20 },
-    { label: '7.5kg', preco: 36.90, stock: 10 },
-  ]},
-  { id: 21, especie: 'gato', gama: 'Prime', nome: 'Ownat Prime Sterilized (Gato)', tamanhos: [
-    { label: '1.5kg', preco: 10.50, stock: 15 },
-    { label: '3kg', preco: 18.90, stock: 15 },
-  ]},
-
-  // ---------- OWNAT JUST (cão) ----------
-  { id: 40, especie: 'cao', gama: 'Just', nome: 'Ownat Just Grain Free Adult Chicken (Cão)', tamanhos: [
-    { label: '3kg', preco: 15.90, stock: 15 },
-    { label: '7.5kg', preco: 31.90, stock: 15 },
-    { label: '14kg', preco: 49.90, stock: 10 },
-  ]},
-  { id: 41, especie: 'cao', gama: 'Just', nome: 'Ownat Just Grain Free Adult Salmon (Cão)', tamanhos: [
-    { label: '3kg', preco: 16.90, stock: 10 },
-    { label: '7.5kg', preco: 33.90, stock: 10 },
-  ]},
-
-  // ---------- OWNAT JUST (gato) ----------
-  { id: 45, especie: 'gato', gama: 'Just', nome: 'Ownat Just Grain Free Adult Chicken (Gato)', tamanhos: [
-    { label: '1.5kg', preco: 12.50, stock: 15 },
-    { label: '3kg', preco: 21.90, stock: 15 },
-  ]},
-
-  // ---------- OWNAT AUTHOR (cão) ----------
-  { id: 60, especie: 'cao', gama: 'Author', nome: 'Ownat Author Grain Free Adult Medium (Cão)', tamanhos: [
-    { label: '3kg', preco: 18.90, stock: 10 },
-    { label: '14kg', preco: 59.90, stock: 8 },
-  ]},
-  { id: 61, especie: 'cao', gama: 'Author', nome: 'Ownat Author Grain Free Adult Mini (Cão)', tamanhos: [
-    { label: '3kg', preco: 19.90, stock: 8 },
-    { label: '7.5kg', preco: 39.90, stock: 8 },
-  ]},
-
-  // ---------- OWNAT AUTHOR (gato) ----------
-  { id: 65, especie: 'gato', gama: 'Author', nome: 'Ownat Author Grain Free Adult (Gato)', tamanhos: [
-    { label: '1.5kg', preco: 14.90, stock: 10 },
-    { label: '3kg', preco: 25.90, stock: 8 },
-  ]},
-
-  // ---------- OWNAT CLASSIC (cão) ----------
-  { id: 80, especie: 'cao', gama: 'Classic', nome: 'Ownat Classic Complet (Cão)', tamanhos: [
-    { label: '4kg', preco: 10.90, stock: 25 },
-    { label: '15kg', preco: 28.90, stock: 20 },
-    { label: '20kg', preco: 35.90, stock: 15 },
-  ]},
-  { id: 81, especie: 'cao', gama: 'Classic', nome: 'Ownat Classic Puppy (Cão)', tamanhos: [
-    { label: '4kg', preco: 11.90, stock: 15 },
-    { label: '15kg', preco: 31.90, stock: 12 },
-  ]},
-
-  // ---------- OWNAT CLASSIC (gato) ----------
-  { id: 85, especie: 'gato', gama: 'Classic', nome: 'Ownat Classic Adult (Gato)', tamanhos: [
-    { label: '1.5kg', preco: 7.90, stock: 20 },
-    { label: '8kg', preco: 29.90, stock: 15 },
-  ]},
+  { id: 1, especie: 'gato', gama: 'Prime', nome: "Ownat Grain Free Prime Sterilized Fish (Gato)", imagem: "https://centroveterinariolindaavelha.pt/produtos/ownat-prime-sterilized-fish-gato.jpg", tamanhos: [{ label: "1.5kg", preco: 10.5, stock: 15 }, { label: "3kg", preco: 18.9, stock: 15 }] },
+  { id: 2, especie: 'gato', gama: 'Author', nome: "Ownat Author Sterilized Fresh Chicken (Gato)", imagem: "https://centroveterinariolindaavelha.pt/produtos/ownat-author-sterilized-chicken-gato.jpg", tamanhos: [{ label: "1.5kg", preco: 15.9, stock: 15 }, { label: "3kg", preco: 26.9, stock: 15 }] },
+  { id: 3, especie: 'gato', gama: 'Author', nome: "Ownat Author Fresh Oily Fish & Poultry (Gato)", imagem: "https://centroveterinariolindaavelha.pt/produtos/ownat-author-oily-fish-poultry-gato.jpg", tamanhos: [{ label: "1.5kg", preco: 15.9, stock: 15 }, { label: "3kg", preco: 26.9, stock: 15 }] },
+  { id: 4, especie: 'cao', gama: 'Just', nome: "Ownat Just Grain Free Junior (Cão)", imagem: "https://centroveterinariolindaavelha.pt/produtos/ownat-gf-junior-cao.jpg", tamanhos: [{ label: "3kg", preco: 16.9, stock: 15 }, { label: "14kg", preco: 49.9, stock: 15 }] },
+  { id: 5, especie: 'cao', gama: 'Just', nome: "Ownat Just Grain Free Light (Cão)", imagem: "https://centroveterinariolindaavelha.pt/produtos/ownat-gf-light-cao.jpg", tamanhos: [{ label: "3kg", preco: 16.9, stock: 15 }, { label: "14kg", preco: 49.9, stock: 15 }] },
+  { id: 6, especie: 'gato', gama: 'Prime', nome: "Ownat Grain Free Prime Adult Chicken & Turkey (Gato)", imagem: "https://centroveterinariolindaavelha.pt/produtos/ownat-prime-adult-chicken-turkey-gato.jpg", tamanhos: [{ label: "1.5kg", preco: 10.5, stock: 15 }, { label: "3kg", preco: 18.9, stock: 15 }] },
+  { id: 7, especie: 'cao', gama: 'Prime', nome: "Ownat Grain Free Prime Adult Chicken & Turkey (Cão)", imagem: "https://centroveterinariolindaavelha.pt/produtos/ownat-prime-adult-chicken-turkey-cao.jpg", tamanhos: [{ label: "3kg", preco: 13.5, stock: 15 }, { label: "7.5kg", preco: 26.9, stock: 15 }, { label: "14kg", preco: 42.9, stock: 15 }] },
+  { id: 8, especie: 'gato', gama: 'Prime', nome: "Ownat Grain Free Prime Hair & Skin Care (Gato)", imagem: "https://centroveterinariolindaavelha.pt/produtos/ownat-prime-hair-skin-care-cao.jpg", tamanhos: [{ label: "1.5kg", preco: 10.5, stock: 15 }, { label: "3kg", preco: 18.9, stock: 15 }] },
+  { id: 9, especie: 'cao', gama: 'Prime', nome: "Ownat Grain Free Prime Junior Chicken & Turkey (Cão)", imagem: "https://centroveterinariolindaavelha.pt/produtos/ownat-prime-junior-chicken-turkey-cao.jpg", tamanhos: [{ label: "3kg", preco: 13.5, stock: 15 }, { label: "7.5kg", preco: 26.9, stock: 15 }, { label: "14kg", preco: 42.9, stock: 15 }] },
+  { id: 10, especie: 'gato', gama: 'Prime', nome: "Ownat Grain Free Prime Kitten (Gato)", imagem: "https://centroveterinariolindaavelha.pt/produtos/ownat-prime-kitten-gato.jpg", tamanhos: [{ label: "1.5kg", preco: 10.5, stock: 15 }, { label: "3kg", preco: 18.9, stock: 15 }] },
+  { id: 11, especie: 'cao', gama: 'Prime', nome: "Ownat Grain Free Prime Mini Chicken & Turkey (Cão)", imagem: "https://centroveterinariolindaavelha.pt/produtos/ownat-prime-mini-chicken-turkey-cao.jpg", tamanhos: [{ label: "3kg", preco: 13.5, stock: 15 }, { label: "7.5kg", preco: 26.9, stock: 15 }, { label: "14kg", preco: 42.9, stock: 15 }] },
+  { id: 12, especie: 'cao', gama: 'Prime', nome: "Ownat Grain Free Prime Senior Chicken & Turkey (Cão)", imagem: "https://centroveterinariolindaavelha.pt/produtos/ownat-prime-senior-chicken-turkey-cao.jpg", tamanhos: [{ label: "3kg", preco: 13.5, stock: 15 }, { label: "7.5kg", preco: 26.9, stock: 15 }, { label: "14kg", preco: 42.9, stock: 15 }] },
+  { id: 13, especie: 'gato', gama: 'Prime', nome: "Ownat Grain Free Prime Sterilized (Gato)", imagem: "https://centroveterinariolindaavelha.pt/produtos/ownat-prime-sterilized-gato.jpg", tamanhos: [{ label: "1.5kg", preco: 10.5, stock: 15 }, { label: "3kg", preco: 18.9, stock: 15 }] },
+  { id: 14, especie: 'gato', gama: 'Just', nome: "Ownat Just Grain Free Adult Chicken (Gato)", imagem: "https://centroveterinariolindaavelha.pt/produtos/ownat-just-gf-adult-chicken-gato.jpg", tamanhos: [{ label: "1.5kg", preco: 12.5, stock: 15 }, { label: "3kg", preco: 21.9, stock: 15 }] },
+  { id: 15, especie: 'cao', gama: 'Just', nome: "Ownat Just Grain Free Adult Chicken (Cão)", imagem: "https://centroveterinariolindaavelha.pt/produtos/ownat-just-gf-adult-chicken-cao.jpg", tamanhos: [{ label: "3kg", preco: 16.9, stock: 15 }, { label: "14kg", preco: 49.9, stock: 15 }] },
+  { id: 16, especie: 'cao', gama: 'Just', nome: "Ownat Just Grain Free Adult Lamb (Cão)", imagem: "https://centroveterinariolindaavelha.pt/produtos/ownat-just-gf-adult-lamb-cao.jpg", tamanhos: [{ label: "3kg", preco: 16.9, stock: 15 }, { label: "14kg", preco: 49.9, stock: 15 }] },
+  { id: 17, especie: 'cao', gama: 'Just', nome: "Ownat Just Grain Free Pato (Cão)", imagem: "https://centroveterinariolindaavelha.pt/produtos/ownat-just-gf-duck-cao.jpg", tamanhos: [{ label: "3kg", preco: 16.9, stock: 15 }, { label: "14kg", preco: 49.9, stock: 15 }] },
+  { id: 18, especie: 'cao', gama: 'Just', nome: "Ownat Just Grain Free Salmão & Marisco (Cão)", imagem: "https://centroveterinariolindaavelha.pt/produtos/ownat-just-gf-salmon-seafood-cao.jpg", tamanhos: [{ label: "3kg", preco: 16.9, stock: 15 }, { label: "14kg", preco: 49.9, stock: 15 }] },
+  { id: 19, especie: 'gato', gama: 'Just', nome: "Ownat Just Grain Free Esterilizado (Gato)", imagem: "https://centroveterinariolindaavelha.pt/produtos/ownat-just-gf-sterilized-gato.jpg", tamanhos: [{ label: "1.5kg", preco: 12.5, stock: 15 }, { label: "3kg", preco: 21.9, stock: 15 }] },
+  { id: 20, especie: 'cao', gama: 'Just', nome: "Ownat Just Grain Free Truta (Cão)", imagem: "https://centroveterinariolindaavelha.pt/produtos/ownat-just-gf-trout-cao.jpg", tamanhos: [{ label: "3kg", preco: 16.9, stock: 15 }, { label: "14kg", preco: 49.9, stock: 15 }] },
+  { id: 21, especie: 'gato', gama: 'Just', nome: "Ownat Just Grain Free Esterilizado Peixe (Gato)", imagem: "https://centroveterinariolindaavelha.pt/produtos/ownat-just-gf-sterilized-fish-gato.jpg", tamanhos: [{ label: "1.5kg", preco: 12.5, stock: 15 }, { label: "3kg", preco: 21.9, stock: 15 }] },
+  { id: 22, especie: 'gato', gama: 'Care', nome: "Ownat Care Renal (Gato)", imagem: "https://centroveterinariolindaavelha.pt/produtos/ownat-care-renal-gato.png", tamanhos: [{ label: "1.5kg", preco: 13.9, stock: 15 }, { label: "3kg", preco: 24.9, stock: 15 }] },
+  { id: 23, especie: 'cao', gama: 'Care', nome: "Ownat Care Weight Control (Cão)", imagem: "https://centroveterinariolindaavelha.pt/produtos/ownat-care-weight-control-cao.webp", tamanhos: [{ label: "3kg", preco: 17.9, stock: 15 }, { label: "12kg", preco: 54.9, stock: 15 }] },
+  { id: 24, especie: 'gato', gama: 'Care', nome: "Ownat Care Weight Control (Gato)", imagem: "https://centroveterinariolindaavelha.pt/produtos/ownat-care-weight-control-gato.webp", tamanhos: [{ label: "1.5kg", preco: 13.9, stock: 15 }, { label: "3kg", preco: 24.9, stock: 15 }] },
+  { id: 25, especie: 'gato', gama: 'Care', nome: "Ownat Care Hypoallergenic (Gato)", imagem: "https://centroveterinariolindaavelha.pt/produtos/ownat-care-hypoallergenic-gato.jpg", tamanhos: [{ label: "1.5kg", preco: 13.9, stock: 15 }, { label: "3kg", preco: 24.9, stock: 15 }] },
+  { id: 26, especie: 'gato', gama: 'Care', nome: "Ownat Grain Free Hypoallergenic Mini Lamb (Gato)", imagem: "https://centroveterinariolindaavelha.pt/produtos/ownat-gf-hypoallergenic-mini-lamb-gato.jpg", tamanhos: [{ label: "1.5kg", preco: 13.9, stock: 15 }, { label: "3kg", preco: 24.9, stock: 15 }] },
+  { id: 27, especie: 'cao', gama: 'Care', nome: "Ownat Grain Free Hypoallergenic Iberian Pork (Cão)", imagem: "https://centroveterinariolindaavelha.pt/produtos/ownat-gf-hypoallergenic-iberian-pork-cao.jpg", tamanhos: [{ label: "3kg", preco: 17.9, stock: 15 }, { label: "12kg", preco: 54.9, stock: 15 }] },
+  { id: 28, especie: 'cao', gama: 'Care', nome: "Ownat Grain Free Hypoallergenic Lamb (Cão)", imagem: "https://centroveterinariolindaavelha.pt/produtos/ownat-gf-hypoallergenic-lamb-cao.jpg", tamanhos: [{ label: "3kg", preco: 17.9, stock: 15 }, { label: "12kg", preco: 54.9, stock: 15 }] },
+  { id: 29, especie: 'gato', gama: 'Care', nome: "Ownat Care Urinary (Gato)", imagem: "https://centroveterinariolindaavelha.pt/produtos/ownat-care-urinary-gato.png", tamanhos: [{ label: "1.5kg", preco: 13.9, stock: 15 }, { label: "3kg", preco: 24.9, stock: 15 }] },
+  { id: 30, especie: 'cao', gama: 'Care', nome: "Ownat Care Mobility (Cão)", imagem: "https://centroveterinariolindaavelha.pt/produtos/ownat-care-mobility-cao.webp", tamanhos: [{ label: "3kg", preco: 17.9, stock: 15 }, { label: "12kg", preco: 54.9, stock: 15 }] },
+  { id: 31, especie: 'cao', gama: 'Care', nome: "Ownat Care Digestive (Cão)", imagem: "https://centroveterinariolindaavelha.pt/produtos/ownat-care-digestive-cao.webp", tamanhos: [{ label: "3kg", preco: 17.9, stock: 15 }, { label: "12kg", preco: 54.9, stock: 15 }] },
+  { id: 32, especie: 'cao', gama: 'Classic', nome: "Ownat Classic Complet (Cão)", imagem: "https://centroveterinariolindaavelha.pt/produtos/ownat-classic-complet-cao.webp", tamanhos: [{ label: "4kg", preco: 10.9, stock: 15 }, { label: "15kg", preco: 28.9, stock: 15 }, { label: "20kg", preco: 35.9, stock: 15 }] },
+  { id: 33, especie: 'cao', gama: 'Classic', nome: "Ownat Classic Fish (Cão)", imagem: "https://centroveterinariolindaavelha.pt/produtos/ownat-classic-fish-cao.webp", tamanhos: [{ label: "4kg", preco: 10.9, stock: 15 }, { label: "15kg", preco: 28.9, stock: 15 }, { label: "20kg", preco: 35.9, stock: 15 }] },
+  { id: 34, especie: 'cao', gama: 'Classic', nome: "Ownat Classic Junior (Cão)", imagem: "https://centroveterinariolindaavelha.pt/produtos/ownat-classic-junior-cao.webp", tamanhos: [{ label: "4kg", preco: 10.9, stock: 15 }, { label: "15kg", preco: 28.9, stock: 15 }, { label: "20kg", preco: 35.9, stock: 15 }] },
+  { id: 35, especie: 'cao', gama: 'Classic', nome: "Ownat Classic Lamb & Rice (Cão)", imagem: "https://centroveterinariolindaavelha.pt/produtos/ownat-classic-lamb-rice-cao.webp", tamanhos: [{ label: "4kg", preco: 10.9, stock: 15 }, { label: "15kg", preco: 28.9, stock: 15 }, { label: "20kg", preco: 35.9, stock: 15 }] },
+  { id: 36, especie: 'cao', gama: 'Classic', nome: "Ownat Classic Light (Cão)", imagem: "https://centroveterinariolindaavelha.pt/produtos/ownat-classic-light-cao.webp", tamanhos: [{ label: "4kg", preco: 10.9, stock: 15 }, { label: "15kg", preco: 28.9, stock: 15 }, { label: "20kg", preco: 35.9, stock: 15 }] },
+  { id: 37, especie: 'cao', gama: 'Classic', nome: "Ownat Classic Duck (Cão)", imagem: "https://centroveterinariolindaavelha.pt/produtos/ownat-classic-duck-cao.webp", tamanhos: [{ label: "4kg", preco: 10.9, stock: 15 }, { label: "15kg", preco: 28.9, stock: 15 }, { label: "20kg", preco: 35.9, stock: 15 }] },
+  { id: 38, especie: 'gato', gama: 'Classic', nome: "Ownat Classic Daily Care (Gato)", imagem: "https://centroveterinariolindaavelha.pt/produtos/ownat-classic-daily-care-gato.webp", tamanhos: [{ label: "1.5kg", preco: 7.9, stock: 15 }, { label: "8kg", preco: 29.9, stock: 15 }] },
+  { id: 39, especie: 'gato', gama: 'Classic', nome: "Ownat Classic Fish (Gato)", imagem: "https://centroveterinariolindaavelha.pt/produtos/ownat-classic-fish-gato.webp", tamanhos: [{ label: "1.5kg", preco: 7.9, stock: 15 }, { label: "8kg", preco: 29.9, stock: 15 }] },
+  { id: 40, especie: 'gato', gama: 'Classic', nome: "Ownat Classic Hairball (Gato)", imagem: "https://centroveterinariolindaavelha.pt/produtos/ownat-classic-hairball-gato.webp", tamanhos: [{ label: "1.5kg", preco: 7.9, stock: 15 }, { label: "8kg", preco: 29.9, stock: 15 }] },
+  { id: 41, especie: 'gato', gama: 'Classic', nome: "Ownat Classic Kitten (Gato)", imagem: "https://centroveterinariolindaavelha.pt/produtos/ownat-classic-kitten-gato.webp", tamanhos: [{ label: "1.5kg", preco: 7.9, stock: 15 }, { label: "8kg", preco: 29.9, stock: 15 }] },
+  { id: 42, especie: 'gato', gama: 'Classic', nome: "Ownat Classic Light (Gato)", imagem: "https://centroveterinariolindaavelha.pt/produtos/ownat-classic-light-gato.webp", tamanhos: [{ label: "1.5kg", preco: 7.9, stock: 15 }, { label: "8kg", preco: 29.9, stock: 15 }] },
+  { id: 43, especie: 'gato', gama: 'Classic', nome: "Ownat Classic Sterilized (Gato)", imagem: "https://centroveterinariolindaavelha.pt/produtos/ownat-classic-sterilized-gato.webp", tamanhos: [{ label: "1.5kg", preco: 7.9, stock: 15 }, { label: "8kg", preco: 29.9, stock: 15 }] },
+  { id: 44, especie: 'cao', gama: 'Prime', nome: "Ownat Prime Grain Free Mini Lamb (Cão)", imagem: "https://centroveterinariolindaavelha.pt/produtos/ownat-prime-mini-lamb-cao.webp", tamanhos: [{ label: "3kg", preco: 13.5, stock: 15 }, { label: "7.5kg", preco: 26.9, stock: 15 }, { label: "14kg", preco: 42.9, stock: 15 }] },
+  { id: 45, especie: 'cao', gama: 'Prime', nome: "Ownat Prime Grain Free Adult Lamb (Cão)", imagem: "https://centroveterinariolindaavelha.pt/produtos/ownat-prime-adult-lamb-cao.png", tamanhos: [{ label: "3kg", preco: 13.5, stock: 15 }, { label: "7.5kg", preco: 26.9, stock: 15 }, { label: "14kg", preco: 42.9, stock: 15 }] },
+  { id: 46, especie: 'cao', gama: 'Prime', nome: "Ownat Prime Grain Free Junior Lamb (Cão)", imagem: "https://centroveterinariolindaavelha.pt/produtos/ownat-prime-junior-lamb-cao.webp", tamanhos: [{ label: "3kg", preco: 13.5, stock: 15 }, { label: "7.5kg", preco: 26.9, stock: 15 }, { label: "14kg", preco: 42.9, stock: 15 }] },
+  { id: 47, especie: 'cao', gama: 'Prime', nome: "Ownat Prime Grain Free Adult Oily Fish (Cão)", imagem: "https://centroveterinariolindaavelha.pt/produtos/ownat-prime-adult-oily-fish-cao.png", tamanhos: [{ label: "3kg", preco: 13.5, stock: 15 }, { label: "7.5kg", preco: 26.9, stock: 15 }, { label: "14kg", preco: 42.9, stock: 15 }] },
+  { id: 48, especie: 'cao', gama: 'Author', nome: "Ownat Author Fresh Duck & Chicken (Cão)", imagem: "https://centroveterinariolindaavelha.pt/produtos/ownat-author-duck-chicken-cao.jpg", tamanhos: [{ label: "3kg", preco: 19.9, stock: 15 }, { label: "12kg", preco: 59.9, stock: 15 }] },
+  { id: 49, especie: 'cao', gama: 'Author', nome: "Ownat Author Fresh Lamb & Pork (Cão)", imagem: "https://centroveterinariolindaavelha.pt/produtos/ownat-author-lamb-pork-cao.jpg", tamanhos: [{ label: "3kg", preco: 19.9, stock: 15 }, { label: "12kg", preco: 59.9, stock: 15 }] },
+  { id: 50, especie: 'cao', gama: 'Author', nome: "Ownat Author Fresh Rooster (Cão)", imagem: "https://centroveterinariolindaavelha.pt/produtos/ownat-author-rooster-cao.jpg", tamanhos: [{ label: "3kg", preco: 19.9, stock: 15 }, { label: "12kg", preco: 59.9, stock: 15 }] },
+  { id: 51, especie: 'cao', gama: 'Author', nome: "Ownat Author Junior Fresh Chicken (Cão)", imagem: "https://centroveterinariolindaavelha.pt/produtos/ownat-author-junior-chicken-cao.jpg", tamanhos: [{ label: "3kg", preco: 19.9, stock: 15 }, { label: "12kg", preco: 59.9, stock: 15 }] },
 ];

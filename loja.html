@@ -80,6 +80,9 @@ section { padding: 48px 0; }
 @media (max-width: 900px) { .product-grid { grid-template-columns: repeat(2, 1fr); } }
 @media (max-width: 600px) { .product-grid { grid-template-columns: 1fr; } }
 .product-card { background: #fff; border-radius: var(--radius); box-shadow: 0 2px 14px rgba(28,35,33,0.06); padding: 20px; }
+.product-thumb { height: 140px; border-radius: 8px; background: var(--green-soft); display: flex; align-items: center; justify-content: center; margin-bottom: 14px; overflow: hidden; }
+.product-thumb img { width: 100%; height: 100%; object-fit: contain; }
+.product-thumb .placeholder-icon { font-size: 2.4rem; opacity: 0.55; }
 .product-card .gama-tag { display: inline-block; font-size: 0.7rem; font-weight: 800; letter-spacing: 0.04em; text-transform: uppercase; color: var(--gold-dark); background: var(--green-soft); padding: 4px 10px; border-radius: 6px; margin-bottom: 10px; }
 .product-card h3 { font-size: 1rem; margin-bottom: 12px; }
 .size-select { display: flex; flex-direction: column; gap: 6px; margin-bottom: 12px; }
@@ -196,6 +199,14 @@ footer.site strong { color: #fff; }
       <button data-f="cao" onclick="setCatalogFilter('cao', this)">Cão</button>
       <button data-f="gato" onclick="setCatalogFilter('gato', this)">Gato</button>
     </div>
+    <div class="catalog-filters" id="gamaFilters">
+      <button class="active" data-g="todas" onclick="setGamaFilter('todas', this)">Todas as gamas</button>
+      <button data-g="Prime" onclick="setGamaFilter('Prime', this)">Prime</button>
+      <button data-g="Just" onclick="setGamaFilter('Just', this)">Just</button>
+      <button data-g="Author" onclick="setGamaFilter('Author', this)">Author</button>
+      <button data-g="Care" onclick="setGamaFilter('Care', this)">Care</button>
+      <button data-g="Classic" onclick="setGamaFilter('Classic', this)">Classic</button>
+    </div>
     <div class="product-grid" id="productGrid"></div>
   </div>
 </section>
@@ -257,6 +268,13 @@ let currentUser = null;
 let currentCliente = null; // documento em clientes_b2b
 let cart = {}; // { "produtoId_tamanhoLabel": { nome, tamanho, preco, qty } }
 let catalogFilter = 'todos';
+let gamaFilter = 'todas';
+
+function setGamaFilter(g, btn) {
+  gamaFilter = g;
+  document.querySelectorAll('#gamaFilters button').forEach(b => b.classList.toggle('active', b === btn));
+  renderCatalog();
+}
 
 // ---------- Auth ----------
 function setAuthTab(tab) {
@@ -369,7 +387,12 @@ function setCatalogFilter(f, btn) {
 
 function renderCatalog() {
   const grid = document.getElementById('productGrid');
-  const lista = catalogFilter === 'todos' ? produtos : produtos.filter(p => p.especie === catalogFilter);
+  let lista = catalogFilter === 'todos' ? produtos : produtos.filter(p => p.especie === catalogFilter);
+  if (gamaFilter !== 'todas') lista = lista.filter(p => p.gama === gamaFilter);
+  if (lista.length === 0) {
+    grid.innerHTML = '<div class="empty-state">Sem produtos nesta combinação de filtros.</div>';
+    return;
+  }
   grid.innerHTML = lista.map(p => {
     const sizesHtml = p.tamanhos.map((t, i) => `
       <div class="size-opt ${i === 0 ? 'selected' : ''}" data-produto="${p.id}" data-idx="${i}" onclick="selectSize(${p.id}, ${i})">
@@ -378,6 +401,9 @@ function renderCatalog() {
       </div>`).join('');
     return `
       <div class="product-card" id="pcard-${p.id}">
+        <div class="product-thumb">
+          ${p.imagem ? `<img src="${p.imagem}" alt="${p.nome}" loading="lazy">` : `<span class="placeholder-icon">${p.especie === 'gato' ? '🐱' : '🐶'}</span>`}
+        </div>
         <span class="gama-tag">${p.gama}</span>
         <h3>${p.nome}</h3>
         <div class="size-select" id="sizes-${p.id}">${sizesHtml}</div>
