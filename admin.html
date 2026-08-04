@@ -142,6 +142,7 @@ function loadClientes() {
     if (snap.empty) { el.innerHTML = '<div class="empty-state">Ainda não há registos de clientes.</div>'; return; }
     el.innerHTML = snap.docs.map(doc => {
       const c = doc.data();
+      const desconto = c.desconto || 0;
       return `
         <div class="entry-card">
           <div class="entry-top">
@@ -152,10 +153,15 @@ function loadClientes() {
             </div>
             <span class="badge ${c.aprovado ? 'aprovado' : 'pendente'}">${c.aprovado ? 'Aprovado' : 'Pendente'}</span>
           </div>
-          <div class="entry-actions">
+          <div class="entry-actions" style="align-items:center;">
             ${c.aprovado
               ? `<button class="btn" onclick="setAprovado('${doc.id}', false)">Revogar aprovação</button>`
               : `<button class="btn primary" onclick="setAprovado('${doc.id}', true)">Aprovar</button>`}
+            <span style="display:flex; align-items:center; gap:6px; margin-left:6px;">
+              <label style="font-size:0.85rem; color:var(--gray);">Desconto:</label>
+              <input type="number" id="desc-${doc.id}" value="${desconto}" min="0" max="100" style="width:64px;"> %
+              <button class="btn" onclick="setDesconto('${doc.id}')">Guardar</button>
+            </span>
           </div>
         </div>`;
     }).join('');
@@ -164,6 +170,13 @@ function loadClientes() {
 
 function setAprovado(uid, aprovado) {
   db.collection('clientes_b2b').doc(uid).update({ aprovado }).then(loadClientes);
+}
+
+function setDesconto(uid) {
+  const val = parseFloat(document.getElementById(`desc-${uid}`).value || '0');
+  db.collection('clientes_b2b').doc(uid).update({ desconto: val }).then(() => {
+    alert('Desconto guardado: ' + val + '%');
+  });
 }
 
 // ---------- Encomendas ----------
@@ -185,7 +198,7 @@ function loadPedidos() {
           <div class="entry-top">
             <div>
               <div class="entry-title">${p.empresa}</div>
-              <div class="entry-sub">NIF: ${p.nif} · ${metodoLabel} · Total: ${(p.total || 0).toFixed(2)}€</div>
+              <div class="entry-sub">NIF: ${p.nif} · ${metodoLabel} · Total: ${(p.total || 0).toFixed(2)}€${p.desconto ? ` (desconto de cliente: -${p.desconto}%)` : ''}</div>
             </div>
             <span class="badge ${p.estado}">${p.estado}</span>
           </div>
