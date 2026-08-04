@@ -224,8 +224,9 @@ footer.site strong { color: #fff; }
   </div>
   <div class="cart-items" id="cartItems"></div>
   <div class="cart-footer">
-    <div id="cartDescontoNote" style="font-size:0.82rem; color:var(--gold-dark); font-weight:700; margin-bottom:8px;"></div>
-    <div class="cart-total"><span>Total</span><span id="cartTotal">0,00€</span></div>
+    <div class="cart-total" style="font-size:0.9rem; font-weight:600; color:var(--gray); margin-bottom:6px;"><span>Subtotal</span><span id="cartSubtotal">0,00€</span></div>
+    <div id="cartDescontoRow" class="cart-total" style="font-size:0.9rem; font-weight:600; color:var(--gold-dark); margin-bottom:6px; display:none;"><span>Desconto</span><span id="cartDescontoValor">0,00€</span></div>
+    <div class="cart-total" style="border-top:1px solid var(--border); padding-top:10px;"><span>Total</span><span id="cartTotal">0,00€</span></div>
     <div class="payment-method-select">
       <label class="payment-opt"><input type="radio" name="payMethod" value="cheque30" checked> Cheque a 30 dias</label>
       <label class="payment-opt"><input type="radio" name="payMethod" value="pronto"> Pronto pagamento</label>
@@ -387,11 +388,6 @@ function setCatalogFilter(f, btn) {
   renderCatalog();
 }
 
-function precoComDesconto(preco) {
-  const desconto = (currentCliente && currentCliente.desconto) || 0;
-  return desconto > 0 ? preco * (1 - desconto / 100) : preco;
-}
-
 function renderCatalog() {
   const grid = document.getElementById('productGrid');
   let lista = catalogFilter === 'todos' ? produtos : produtos.filter(p => p.especie === catalogFilter);
@@ -400,25 +396,18 @@ function renderCatalog() {
     grid.innerHTML = '<div class="empty-state">Sem produtos nesta combinação de filtros.</div>';
     return;
   }
-  const desconto = (currentCliente && currentCliente.desconto) || 0;
   grid.innerHTML = lista.map(p => {
-    const sizesHtml = p.tamanhos.map((t, i) => {
-      const finalPreco = precoComDesconto(t.preco);
-      const precoHtml = desconto > 0
-        ? `<span class="price"><span style="text-decoration:line-through; color:var(--gray-light); font-weight:500; font-size:0.82em; margin-right:5px;">${t.preco.toFixed(2)}€</span>${finalPreco.toFixed(2)}€</span>`
-        : `<span class="price">${t.preco.toFixed(2)}€</span>`;
-      return `
+    const sizesHtml = p.tamanhos.map((t, i) => `
       <div class="size-opt ${i === 0 ? 'selected' : ''}" data-produto="${p.id}" data-idx="${i}" onclick="selectSize(${p.id}, ${i})">
         <span>${t.label}</span>
-        ${precoHtml}
-      </div>`;
-    }).join('');
+        <span class="price">${t.preco.toFixed(2)}€</span>
+      </div>`).join('');
     return `
       <div class="product-card" id="pcard-${p.id}">
         <div class="product-thumb">
           ${p.imagem ? `<img src="${p.imagem}" alt="${p.nome}" loading="lazy">` : `<span class="placeholder-icon">${p.especie === 'gato' ? '🐱' : '🐶'}</span>`}
         </div>
-        <span class="gama-tag">${p.gama}${desconto > 0 ? ` · -${desconto}%` : ''}</span>
+        <span class="gama-tag">${p.gama}</span>
         <h3>${p.nome}</h3>
         <div class="size-select" id="sizes-${p.id}">${sizesHtml}</div>
         <div class="qty-row">
@@ -447,11 +436,10 @@ function addToCart(produtoId) {
   const tamanho = p.tamanhos[idx];
   const qty = parseInt(document.getElementById(`qty-${produtoId}`).value || '1', 10);
   const key = `${produtoId}_${tamanho.label}`;
-  const precoFinal = precoComDesconto(tamanho.preco);
   if (cart[key]) {
     cart[key].qty += qty;
   } else {
-    cart[key] = { nome: p.nome, tamanho: tamanho.label, preco: precoFinal, precoOriginal: tamanho.preco, qty };
+    cart[key] = { nome: p.nome, tamanho: tamanho.label, preco: tamanho.preco, qty };
   }
   renderCart();
   openCart();
@@ -462,30 +450,42 @@ function renderCart() {
   const keys = Object.keys(cart);
   const countEl = document.getElementById('cartCount');
   const itemsEl = document.getElementById('cartItems');
+  const subtotalEl = document.getElementById('cartSubtotal');
+  const descontoRowEl = document.getElementById('cartDescontoRow');
+  const descontoValorEl = document.getElementById('cartDescontoValor');
   const totalEl = document.getElementById('cartTotal');
-  const descontoNoteEl = document.getElementById('cartDescontoNote');
   const desconto = (currentCliente && currentCliente.desconto) || 0;
-  descontoNoteEl.textContent = desconto > 0 ? `Desconto de cliente aplicado: -${desconto}%` : '';
   countEl.textContent = keys.reduce((s, k) => s + cart[k].qty, 0);
   if (keys.length === 0) {
     itemsEl.innerHTML = '<div class="empty-state">O carrinho está vazio.</div>';
+    subtotalEl.textContent = '0,00€';
+    descontoRowEl.style.display = 'none';
     totalEl.textContent = '0,00€';
     return;
   }
-  let total = 0;
+  let subtotal = 0;
   itemsEl.innerHTML = keys.map(k => {
     const it = cart[k];
-    const subtotal = it.preco * it.qty;
-    total += subtotal;
+    const itemSubtotal = it.preco * it.qty;
+    subtotal += itemSubtotal;
     return `
       <div class="cart-item">
         <div>${it.nome}<br><span style="color:var(--gray-light);">${it.tamanho} × ${it.qty}</span></div>
         <div style="text-align:right;">
-          ${subtotal.toFixed(2)}€<br>
+          ${itemSubtotal.toFixed(2)}€<br>
           <a href="#" onclick="removeFromCart('${k}'); return false;" style="color:var(--red); font-size:0.8rem;">remover</a>
         </div>
       </div>`;
   }).join('');
+  const valorDesconto = subtotal * (desconto / 100);
+  const total = subtotal - valorDesconto;
+  subtotalEl.textContent = subtotal.toFixed(2) + '€';
+  if (desconto > 0) {
+    descontoRowEl.style.display = 'flex';
+    descontoValorEl.textContent = `-${valorDesconto.toFixed(2)}€ (${desconto}%)`;
+  } else {
+    descontoRowEl.style.display = 'none';
+  }
   totalEl.textContent = total.toFixed(2) + '€';
 }
 
@@ -513,13 +513,16 @@ function submitPedido() {
   }
   const metodoPagamento = document.querySelector('input[name="payMethod"]:checked').value;
   const itens = keys.map(k => cart[k]);
-  const total = itens.reduce((s, it) => s + it.preco * it.qty, 0);
+  const subtotal = itens.reduce((s, it) => s + it.preco * it.qty, 0);
+  const desconto = currentCliente.desconto || 0;
+  const valorDesconto = subtotal * (desconto / 100);
+  const total = subtotal - valorDesconto;
 
   db.collection('pedidos_b2b').add({
     clienteUid: currentUser.uid,
     empresa: currentCliente.empresa,
     nif: currentCliente.nif,
-    desconto: currentCliente.desconto || 0,
+    desconto, subtotal, valorDesconto,
     itens, total, metodoPagamento,
     estado: 'pendente', // pendente -> separado -> enviado
     criadoEm: firebase.firestore.FieldValue.serverTimestamp()

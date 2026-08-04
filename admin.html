@@ -198,7 +198,8 @@ function loadPedidos() {
           <div class="entry-top">
             <div>
               <div class="entry-title">${p.empresa}</div>
-              <div class="entry-sub">NIF: ${p.nif} · ${metodoLabel} · Total: ${(p.total || 0).toFixed(2)}€${p.desconto ? ` (desconto de cliente: -${p.desconto}%)` : ''}</div>
+              <div class="entry-sub">NIF: ${p.nif} · ${metodoLabel}</div>
+              <div class="entry-sub">${p.subtotal ? `Subtotal: ${p.subtotal.toFixed(2)}€` : ''}${p.desconto ? ` · Desconto (${p.desconto}%): -${(p.valorDesconto || 0).toFixed(2)}€` : ''} · <strong>Total: ${(p.total || 0).toFixed(2)}€</strong></div>
             </div>
             <span class="badge ${p.estado}">${p.estado}</span>
           </div>
