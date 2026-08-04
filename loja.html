@@ -346,6 +346,30 @@ function doLogout() {
   auth.signOut();
 }
 
+// ---------- Sessão expira ao fim de 1h de inatividade ----------
+const TEMPO_LIMITE_MS = 60 * 60 * 1000; // 1 hora
+const CHAVE_ULTIMA_ATIVIDADE = 'ownat_ultima_atividade';
+
+function registarAtividade() {
+  localStorage.setItem(CHAVE_ULTIMA_ATIVIDADE, Date.now().toString());
+}
+
+function sessaoExpirada() {
+  const ultima = parseInt(localStorage.getItem(CHAVE_ULTIMA_ATIVIDADE) || '0', 10);
+  return ultima > 0 && (Date.now() - ultima) > TEMPO_LIMITE_MS;
+}
+
+['click', 'keydown', 'mousemove', 'scroll', 'touchstart'].forEach(evento => {
+  document.addEventListener(evento, registarAtividade, { passive: true });
+});
+
+// Verifica a cada minuto se passou 1h desde a última interação
+setInterval(() => {
+  if (currentUser && sessaoExpirada()) {
+    doLogout();
+  }
+}, 60 * 1000);
+
 auth.onAuthStateChanged(user => {
   currentUser = user;
   if (!user) {
@@ -353,6 +377,12 @@ auth.onAuthStateChanged(user => {
     updateHeaderActions();
     return;
   }
+  // Se já passou mais de 1h desde a última interação (por exemplo, a aba esteve fechada), termina a sessão de imediato
+  if (sessaoExpirada()) {
+    doLogout();
+    return;
+  }
+  registarAtividade();
   db.collection('clientes_b2b').doc(user.uid).get().then(doc => {
     currentCliente = doc.exists ? doc.data() : null;
     updateHeaderActions();
