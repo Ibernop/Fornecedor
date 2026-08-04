@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="pt-PT">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Gestão | Ownat B2B — Ibernop</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root {
+  --ink: #1c2321; --charcoal: #2b3430; --charcoal-2: #38443e;
+  --gold: #b8873c; --gold-dark: #96692a;
+  --gray: #5c6b64; --gray-light: #8a978f;
+  --bg: #ffffff; --bg-alt: #f4f6f4; --border: #e1e6e2;
+  --green-soft: #eef2ec; --red: #b23b3b;
+  --radius: 12px; --radius-pill: 999px;
+  --font: "Inter", "Segoe UI", sans-serif;
+}
+* { box-sizing: border-box; }
+body { margin: 0; font-family: var(--font); color: var(--ink); background: var(--bg-alt); }
+.wrap { max-width: 1000px; margin: 0 auto; padding: 24px; }
+.btn { display: inline-flex; align-items: center; gap: 6px; padding: 9px 16px; border-radius: 8px; font-weight: 700; font-size: 0.85rem; border: 1.5px solid var(--border); background: #fff; cursor: pointer; color: var(--charcoal); }
+.btn.primary { background: var(--gold); color: #fff; border-color: var(--gold); }
+.btn.danger { color: var(--red); }
+input, select, textarea { padding: 10px 12px; border: 1px solid var(--border); border-radius: 8px; font-family: inherit; font-size: 0.9rem; }
+
+/* ---------- Login ---------- */
+#loginBox { max-width: 400px; margin: 80px auto; background: #fff; border-radius: var(--radius); padding: 32px; box-shadow: 0 2px 20px rgba(0,0,0,0.08); }
+#loginBox h2 { margin-top: 0; }
+#loginBox input { width: 100%; margin-bottom: 12px; }
+.admin-error { display: none; background: #fbe9e9; color: var(--red); padding: 10px 14px; border-radius: 8px; font-size: 0.85rem; margin-bottom: 12px; }
+.admin-error.show { display: block; }
+
+/* ---------- App ---------- */
+#app { display: none; }
+.topbar { display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px; }
+.topbar h1 { font-size: 1.3rem; margin: 0; }
+.tabs { display: flex; gap: 8px; margin-bottom: 22px; flex-wrap: wrap; }
+.tabs button { padding: 10px 18px; border-radius: 8px; border: 1.5px solid var(--border); background: #fff; font-weight: 700; cursor: pointer; color: var(--gray); font-size: 0.88rem; }
+.tabs button.active { background: var(--charcoal); color: #fff; border-color: var(--charcoal); }
+
+.entry-card { background: #fff; border-radius: var(--radius); padding: 18px 20px; margin-bottom: 12px; box-shadow: 0 2px 12px rgba(0,0,0,0.05); }
+.entry-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; flex-wrap: wrap; }
+.entry-title { font-weight: 800; font-size: 1.02rem; }
+.entry-sub { color: var(--gray); font-size: 0.86rem; margin-top: 2px; }
+.badge { display: inline-block; padding: 4px 10px; border-radius: var(--radius-pill); font-size: 0.72rem; font-weight: 800; text-transform: uppercase; }
+.badge.pendente { background: #fef3e0; color: #b8720a; }
+.badge.aprovado { background: var(--green-soft); color: var(--gold-dark); }
+.badge.separado { background: #e3ecfa; color: #2255a4; }
+.badge.enviado { background: var(--green-soft); color: #237a4b; }
+.entry-actions { margin-top: 12px; display: flex; gap: 8px; flex-wrap: wrap; }
+.itens-list { margin-top: 10px; font-size: 0.86rem; color: var(--gray); }
+.empty-state { text-align: center; color: var(--gray-light); padding: 50px 20px; }
+</style>
+</head>
+<body>
+
+<div id="loginBox">
+  <h2>Gestão Ownat B2B</h2>
+  <p style="color:var(--gray); font-size:0.88rem;">Acesso restrito à equipa Ibernop.</p>
+  <div class="admin-error" id="loginError"></div>
+  <input type="email" id="adminEmail" placeholder="E-mail">
+  <input type="password" id="adminPassword" placeholder="Palavra-passe">
+  <button class="btn primary" style="width:100%; justify-content:center;" onclick="doLogin()">Entrar</button>
+</div>
+
+<div id="app">
+  <div class="wrap">
+    <div class="topbar">
+      <h1>Gestão Ownat B2B</h1>
+      <button class="btn" onclick="doLogout()">Sair</button>
+    </div>
+    <div class="tabs">
+      <button id="tabClientes" class="active" onclick="setTab('clientes')">Clientes</button>
+      <button id="tabPedidos" onclick="setTab('pedidos')">Encomendas</button>
+    </div>
+
+    <div id="panelClientes"></div>
+    <div id="panelPedidos" style="display:none;"></div>
+  </div>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<script>
+// ATENÇÃO: mesmo projeto Firebase do loja.html deste projeto Ownat B2B —
+// mas continua a ter de ser DIFERENTE do projeto do Centro Veterinário.
+const firebaseConfig = {
+  apiKey: "SUBSTITUIR",
+  authDomain: "SUBSTITUIR.firebaseapp.com",
+  projectId: "SUBSTITUIR",
+  storageBucket: "SUBSTITUIR.firebasestorage.app",
+  messagingSenderId: "SUBSTITUIR",
+  appId: "SUBSTITUIR"
+};
+firebase.initializeApp(firebaseConfig);
+const auth = firebase.auth();
+const db = firebase.firestore();
+
+const ADMIN_EMAILS = ["geral@ibernop.com"]; // substituir pelo(s) e-mail(s) reais da equipa
+
+function doLogin() {
+  const email = document.getElementById('adminEmail').value.trim();
+  const password = document.getElementById('adminPassword').value;
+  const errEl = document.getElementById('loginError');
+  errEl.classList.remove('show');
+  auth.signInWithEmailAndPassword(email, password).catch(err => {
+    errEl.textContent = 'E-mail ou palavra-passe incorretos.';
+    errEl.classList.add('show');
+  });
+}
+function doLogout() { auth.signOut(); }
+
+auth.onAuthStateChanged(user => {
+  const isAdmin = user && ADMIN_EMAILS.includes(user.email);
+  document.getElementById('loginBox').style.display = isAdmin ? 'none' : 'block';
+  document.getElementById('app').style.display = isAdmin ? 'block' : 'none';
+  if (isAdmin) {
+    loadClientes();
+  } else if (user && !isAdmin) {
+    document.getElementById('loginError').textContent = 'Esta conta não tem acesso à gestão.';
+    document.getElementById('loginError').classList.add('show');
+    auth.signOut();
+  }
+});
+
+function setTab(tab) {
+  document.getElementById('tabClientes').classList.toggle('active', tab === 'clientes');
+  document.getElementById('tabPedidos').classList.toggle('active', tab === 'pedidos');
+  document.getElementById('panelClientes').style.display = tab === 'clientes' ? 'block' : 'none';
+  document.getElementById('panelPedidos').style.display = tab === 'pedidos' ? 'block' : 'none';
+  if (tab === 'clientes') loadClientes();
+  if (tab === 'pedidos') loadPedidos();
+}
+
+// ---------- Clientes ----------
+function loadClientes() {
+  const el = document.getElementById('panelClientes');
+  el.innerHTML = '<div class="empty-state">A carregar...</div>';
+  db.collection('clientes_b2b').orderBy('criadoEm', 'desc').get().then(snap => {
+    if (snap.empty) { el.innerHTML = '<div class="empty-state">Ainda não há registos de clientes.</div>'; return; }
+    el.innerHTML = snap.docs.map(doc => {
+      const c = doc.data();
+      return `
+        <div class="entry-card">
+          <div class="entry-top">
+            <div>
+              <div class="entry-title">${c.empresa}</div>
+              <div class="entry-sub">${c.contacto} · ${c.email} · ${c.telefone}</div>
+              <div class="entry-sub">NIF: ${c.nif} · ${c.morada}</div>
+            </div>
+            <span class="badge ${c.aprovado ? 'aprovado' : 'pendente'}">${c.aprovado ? 'Aprovado' : 'Pendente'}</span>
+          </div>
+          <div class="entry-actions">
+            ${c.aprovado
+              ? `<button class="btn" onclick="setAprovado('${doc.id}', false)">Revogar aprovação</button>`
+              : `<button class="btn primary" onclick="setAprovado('${doc.id}', true)">Aprovar</button>`}
+          </div>
+        </div>`;
+    }).join('');
+  });
+}
+
+function setAprovado(uid, aprovado) {
+  db.collection('clientes_b2b').doc(uid).update({ aprovado }).then(loadClientes);
+}
+
+// ---------- Encomendas ----------
+function loadPedidos() {
+  const el = document.getElementById('panelPedidos');
+  el.innerHTML = '<div class="empty-state">A carregar...</div>';
+  db.collection('pedidos_b2b').orderBy('criadoEm', 'desc').get().then(snap => {
+    if (snap.empty) { el.innerHTML = '<div class="empty-state">Ainda não há encomendas.</div>'; return; }
+    el.innerHTML = snap.docs.map(doc => {
+      const p = doc.data();
+      const itensHtml = (p.itens || []).map(it => `${it.qty}x ${it.nome} (${it.tamanho}) — ${(it.preco * it.qty).toFixed(2)}€`).join('<br>');
+      const metodoLabel = p.metodoPagamento === 'cheque30' ? 'Cheque a 30 dias' : 'Pronto pagamento';
+      let actions = '';
+      if (p.estado === 'pendente') actions = `<button class="btn primary" onclick="setEstadoPedido('${doc.id}','separado')">Marcar como separado</button>`;
+      else if (p.estado === 'separado') actions = `<button class="btn primary" onclick="setEstadoPedido('${doc.id}','enviado')">Marcar como enviado</button> <button class="btn" onclick="setEstadoPedido('${doc.id}','pendente')">Voltar a pendente</button>`;
+      else actions = `<button class="btn" onclick="setEstadoPedido('${doc.id}','separado')">Reabrir</button>`;
+      return `
+        <div class="entry-card">
+          <div class="entry-top">
+            <div>
+              <div class="entry-title">${p.empresa}</div>
+              <div class="entry-sub">NIF: ${p.nif} · ${metodoLabel} · Total: ${(p.total || 0).toFixed(2)}€</div>
+            </div>
+            <span class="badge ${p.estado}">${p.estado}</span>
+          </div>
+          <div class="itens-list">${itensHtml}</div>
+          <div class="entry-actions">${actions}</div>
+        </div>`;
+    }).join('');
+  });
+}
+
+function setEstadoPedido(id, estado) {
+  db.collection('pedidos_b2b').doc(id).update({ estado }).then(loadPedidos);
+}
+</script>
+</body>
+</html>
